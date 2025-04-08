@@ -1,0 +1,61 @@
+pipeline {
+    tools {
+        nodejs "nodejs"
+    }
+    agent any
+
+    stages {
+
+        stage('Git Checkout') {
+            steps {
+                git branch: 'my-project', url: 'https://github.com/kiranbs2000/own-project.git'
+            }
+        }
+
+        stage('Build Node.js') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t my-app .'
+            }
+        }
+
+        stage('Docker Run') {
+            steps {
+                sh 'docker run -d --name c1 -p 3000:3000 my-app'
+            }
+        }
+
+        stage('Cleanup Docker') {
+            steps {
+                sh '''
+                    docker stop c1 || true
+                    docker rm c1 || true
+                '''
+            }
+        }
+
+        stage('Deploy to MicroK8s') {
+            steps {
+                sh '''
+                    microk8s kubectl apply -f k8s/deployment.yaml
+                    microk8s kubectl apply -f k8s/service.yaml
+                '''
+            }
+        }
+
+        stage('Deploy Monitoring Tools') {
+            steps {
+                sh '''
+                    microk8s kubectl apply -f monitoring/prometheus.yaml
+                    microk8s kubectl apply -f monitoring/grafana.yaml
+                '''
+            }
+        }
+
+    }
+}
