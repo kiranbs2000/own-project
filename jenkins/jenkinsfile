@@ -25,13 +25,19 @@ pipeline {
 
         stage('Docker Run') {
             steps {
-                sh '''
-                    docker rm -f c1 || true
-                    docker run -d --name c1 -p 3000:3000 my-app
-                    echo "Waiting for the app to start..."
-                    sleep 15
-                    docker ps
-                '''
+                 sh '''
+            # Stop and remove any container using port 3000
+            CONTAINER_ID=$(docker ps -q --filter "publish=3000")
+            if [ ! -z "$CONTAINER_ID" ]; then
+              docker stop $CONTAINER_ID
+              docker rm $CONTAINER_ID
+            fi
+
+            docker rm -f c1 || true
+            docker run -d --name c1 -p 3000:3000 my-app
+            sleep 10
+            docker ps
+        '''
             }
         }
 
