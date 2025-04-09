@@ -42,8 +42,8 @@ pipeline {
         stage('Deploy to MicroK8s') {
             steps {
                 sh '''
-                    microk8s kubectl apply -f k8s/deployment.yaml
-                    microk8s kubectl apply -f k8s/service.yaml
+                    kubectl apply -f deployment.yaml
+                    kubectl apply -f service.yaml
                 '''
             }
         }
@@ -51,8 +51,8 @@ pipeline {
         stage('Deploy Monitoring Tools') {
             steps {
                 sh '''
-                    microk8s kubectl apply -f monitoring/prometheus.yaml
-                    microk8s kubectl apply -f monitoring/grafana.yaml
+                    kubectl apply -f prometheus.yaml
+                    kubectl apply -f grafana.yaml
                 '''
             }
         }
