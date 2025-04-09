@@ -9,8 +9,6 @@ spec:
   selector:
     matchLabels:
       app: my-app
-  strategy:
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -18,6 +16,8 @@ spec:
     spec:
       containers:
         - name: my-app-container
-          image: node:18-alpine
+          image: my-app:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
+
