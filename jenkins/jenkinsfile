@@ -50,12 +50,18 @@ pipeline {
 
         stage('Deploy Monitoring Tools') {
             steps {
-                sh '''
-                    kubectl apply -f prometheus.yaml
-                    kubectl apply -f grafana.yaml
-                '''
+                script {
+                    // Create the namespace if it doesn't exist
+                    sh 'kubectl create namespace monitoring || echo "Namespace already exists"'
+
+                    // Apply the Prometheus and Grafana manifests in the correct namespace
+                    sh '''
+                        kubectl apply -f prometheus.yaml -n monitoring
+                        kubectl apply -f grafana.yaml -n monitoring
+                    '''
+                }
             }
         }
 
-    }
-}
+    } // End of stages
+} // End of pipeline
